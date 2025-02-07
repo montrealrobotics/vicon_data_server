@@ -6,9 +6,11 @@ Makefile
 
 # Ignore compiled binaries
 *.o
-*.so
 *.a
 *.exe
+
+# Allow all shared libraries in the lib/ directory
+!lib/*.so
 
 # Ignore system-specific files
 .DS_Store
