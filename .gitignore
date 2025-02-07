@@ -1,0 +1,16 @@
+# Ignore build files
+/build/
+/CMakeCache.txt
+/CMakeFiles/
+Makefile
+
+# Ignore compiled binaries
+*.o
+*.so
+*.a
+*.exe
+
+# Ignore system-specific files
+.DS_Store
+Thumbs.db
+
