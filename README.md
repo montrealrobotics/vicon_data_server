@@ -31,4 +31,17 @@ cd scripts
 python3 python/vicon_data_client.py
 ```
 
+## Docker
 
+Current Vicon DataStreamer IP and rigid body name are in the Dockerfile as "172.19.0.61", "go1_v3", edit Dockerfile if you need to update these.
+
+```
+sudo docker build -t vicon-dataserver .
+sudo docker run --network host vicon-dataserver
+```
+
+Then on your local machine, you can run the python client as before. You should only need to install pyzmq with:
+
+```
+pip3 install pyzmq
+```
