@@ -1,6 +1,7 @@
 import zmq
 import json
 import sys
+import time
 
 if len(sys.argv) != 2:
     print("Usage: python client.py <local|remote>")
@@ -22,9 +23,12 @@ elif connection_type == "remote":
     # Replace '127.0.0.1' with the actual server IP if needed
     socket.connect("tcp://127.0.0.1:5555")
 
+# Read the newest message
+socket.setsockopt(zmq.CONFLATE, 1)
 socket.setsockopt_string(zmq.SUBSCRIBE, "")
 
 print("Listening for Vicon data...")
+
 while True:
     message = socket.recv()
     data = json.loads(message.decode("utf-8"))
@@ -34,4 +38,3 @@ while True:
 
     print(f"Position: {position}")
     print(f"Velocity: {velocity}")
-

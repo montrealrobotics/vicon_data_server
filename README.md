@@ -3,7 +3,6 @@
 This project reads tracking data from Vicon Tracker with the [Datastream SDK](https://www.vicon.com/software/datastream-sdk/), computes linear and angular velocity, and sends it over ZeroMQ for real-time processing. 
 Data can be read from python via ZMQ socket.
 
-
 ## Installation
 
 ### **Install Dependencies**
@@ -22,8 +21,8 @@ cd scripts
 ```
 
 ## Run the server
-The server queries the Vicon data streamer SDK at a rate of 100Hz.
-The server can be run on the same machine as the client or it can be run on a remote machine, if running on a different machine to the client, run with "remote" in SOCKET_LOCATION, the defaault is "local":
+The server queries the Vicon data streamer SDK at a rate of 1kHz, the rate that Vicon Tracker is set to will determine the actual rate that data will be received at. We found that connecting to the Vicon machine via ethernet helps to acheive the best update rate.
+The server can be run on the same machine as the client or it can be run on a remote machine, if running on a different machine to the client, run with "remote" in SOCKET_LOCATION, the default is "local":
 
 ```
 ./ViconDataServer <VICON_IP> <RIGID_BODY_NAME> <SOCKET_LOCATION>
