@@ -46,6 +46,7 @@ int main(int argc, char* argv[]) {
     double prev_time = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count() / 1000.0;
 
     while (true) {
+        auto start_time = std::chrono::steady_clock::now();
         vicon.GetFrame();
         
         // Get global translation (position)
@@ -103,7 +104,14 @@ int main(int argc, char* argv[]) {
             socket.send(message, zmq::send_flags::none);
         }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));  // 100Hz update rate
+        auto end_time = std::chrono::steady_clock::now();
+        auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+
+        // Sleep for the remaining time to maintain 100Hz frequency
+        int remaining_time = 10 - elapsed_time.count();  // 10ms for 100Hz
+        if (remaining_time > 0) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(remaining_time));
+        }
     }
 
     return 0;
