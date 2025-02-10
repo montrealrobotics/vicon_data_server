@@ -28,5 +28,5 @@ RUN mkdir -p /app/vicon_data_server/build && cd /app/vicon_data_server/build && 
 
 RUN ls -l /app/vicon_data_server/build/ViconDataServer
 
-CMD ["/app/vicon_data_server/build/ViconDataServer", "172.19.0.61", "go1_v3"]
+CMD ["/app/vicon_data_server/build/ViconDataServer", "172.19.0.61", "go1_v3", "remote"]
 

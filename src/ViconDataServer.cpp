@@ -11,10 +11,12 @@ using namespace std::chrono;
 int main(int argc, char* argv[]) {
     // Default values
     std::string vicon_ip = "192.168.1.100";  // Default Vicon Tracker IP
-    std::string rigid_body_name = "MyRigidBody";  // Default Rigid Body name
+    std::string rigid_body_name = "MyRigidBody";  // Default Rigid Body name//
+    std::string socket_location = "local"; // Running on the same machine as the client
 
-    if (argc > 1) vicon_ip = argv[1];  // IP address as first argument
-    if (argc > 2) rigid_body_name = argv[2];  // Rigid body name as second argument
+    if (argc > 1) vicon_ip = argv[1];
+    if (argc > 2) rigid_body_name = argv[2];
+    if (argc > 3) socket_location = argv[3];
 
     std::cout << "Connecting to Vicon Tracker at " << vicon_ip << std::endl;
     std::cout << "Tracking Rigid Body: " << rigid_body_name << std::endl;
@@ -30,7 +32,13 @@ int main(int argc, char* argv[]) {
     // ZeroMQ Publisher
     zmq::context_t context(1);
     zmq::socket_t socket(context, ZMQ_PUB);
-    socket.bind("tcp://*:5555");  // Bind to port 5555
+    if (socket_location == "local"){
+	std::cout << "Using IPC, connecting to local machine" << std::endl;
+        socket.bind("ipc:///tmp/vicon_data");
+    } else {
+	std::cout << "Using TCP, connecting to remote machine" << std::endl;
+	socket.bind("tcp://*:5555");
+    }
 
     // Store previous position and rotation for velocity calculation
     Eigen::Vector3d prev_position(0, 0, 0);

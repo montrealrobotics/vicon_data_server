@@ -22,13 +22,18 @@ cd scripts
 ```
 
 ## Run the server
+The server queries the Vicon data streamer SDK at a rate of 100Hz.
+The server can be run on the same machine as the client or it can be run on a remote machine, if running on a different machine to the client, run with "remote" in SOCKET_LOCATION, the defaault is "local":
+
 ```
-./ViconDataServer <VICON_IP> <RIGID_BODY_NAME>
+./ViconDataServer <VICON_IP> <RIGID_BODY_NAME> <SOCKET_LOCATION>
 ```
 
 ## Run the python client
+The python client reads position and velocity data from the ViconDataServer. If the server is running on the same machine as the python client. pass the argument 'local', otherwise 'remote'. If the server is running in docker, use 'remote'.
+
 ```
-python3 python/vicon_data_client.py
+python3 python/vicon_data_client.py local
 ```
 
 ## Docker
