@@ -49,3 +49,13 @@ Then on your local machine, you can run the python client as before. You should 
 ```
 pip3 install pyzmq
 ```
+
+## Useful tools
+
+Check out the python folder for some useful(?) scripts.
+
+vicon_plotter.py can be used to plot live data received from the ViconDataStreamer server and save this data to csv or plot from csv file.
+
+vicon_animation.py contains an animator class which can be used to visualise the tracked object while collecting to data for sanity checks. See the vicon_data_client.py for its usage.
+
+If you are trying to find the centroid of your tracked object in vicon, vicon_object_centroid.py is set up to do this for a cuboid body. Our use case is the trunk of the go1.
