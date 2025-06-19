@@ -2,6 +2,7 @@ import zmq
 import json
 import sys
 import time
+from vicon_animate import ViconAnimator
 import matplotlib.pyplot as plt
 import argparse
 
@@ -42,6 +43,7 @@ elif connection_type == "remote":
 
 print("Listening for Vicon data...")
 animator = None
+#animator = ViconAnimator()
 
 # Receive and decode data
 message = socket.recv()
@@ -57,8 +59,25 @@ try:
         # Receive and decode data
         message = socket.recv()
         data = json.loads(message.decode("utf-8"))
-        print(data)
+        position = data["pose"]["position"]
+        orientation = data["pose"]["orientation"]
+        linear_velocity = data["velocity"]["world_frame"]["linear"]
+        angular_velocity = data["velocity"]["world_frame"]["angular"]
+        curr_frame = data["frame_number"]
+        dt = (curr_frame - prev_frame) * (1/frame_rate)
+        prev_frame = curr_frame
+
+        # Update the animation
+        if animator is not None:
+            animator.update(position, orientation, linear_velocity, angular_velocity, dt)
+
+        # Allow real-time plotting
+        if animator is not None:
+            plt.pause(0.01)
 
 except KeyboardInterrupt:
-    print("Vicon data client stopped.")
+    print("Animation stopped.")
 
+# Show the final animation
+if animator is not None:
+    animator.show()

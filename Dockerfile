@@ -7,6 +7,7 @@ RUN apt update && apt install -y \
     && rm -rf /var/lib/apt/lists/*
 
 RUN pip3 install --no-cache-dir pyzmq
+RUN pip3 install --no-cache-dir matplotlib
 
 WORKDIR /app
 
@@ -28,5 +29,5 @@ RUN mkdir -p /app/vicon_data_server/build && cd /app/vicon_data_server/build && 
 
 RUN ls -l /app/vicon_data_server/build/ViconDataServer
 
-CMD ["/app/vicon_data_server/build/ViconDataServer", "172.19.0.61", "go1_v3", "remote"]
+CMD ["/app/vicon_data_server/build/ViconDataServer", "--ip 172.19.0.61", "--object go1_v3", "--location remote"]
 

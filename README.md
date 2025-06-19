@@ -21,19 +21,59 @@ cd scripts
 ```
 
 ## Run the server
-The server queries the Vicon data streamer SDK at a rate of 1kHz, the rate that Vicon Tracker is set to will determine the actual rate that data will be received at. We found that connecting to the Vicon machine via ethernet helps to acheive the best update rate.
-The server can be run on the same machine as the client or it can be run on a remote machine, if running on a different machine to the client, run with "remote" in SOCKET_LOCATION, the default is "local":
+The server queries the Vicon data streamer SDK at a default rate of 1kHz, the rate that Vicon Tracker is set to will determine the actual rate that data will be received at. We found that connecting to the Vicon machine via ethernet helps to acheive the best update rate.
+The server can be run on the same machine as the client or it can be run on a remote machine, if running on a different machine to the client, run with "remote", the default is "local", running from the build directory:
 
 ```
-./ViconDataServer <VICON_IP> <RIGID_BODY_NAME> <SOCKET_LOCATION>
+./ViconDataServer --ip <VICON_IP> --object <RIGID_BODY_NAME> --loction <SOCKET_LOCATION>
 ```
+
+The full set of arguments that can be passed are:
+
+ip: The IP of the machine where vicon is running
+object: The name of the object that is being tracked
+connection: Location of the client, 'remote' or 'local'
+port: the port that the data will stream, default 5555
+rate: loop rate to fetch frames from vicon
+track_markers: if argument included, the position of all markers in the rigid body are tracked, if not, just the rigid body is tracked.
+
+An example:
+```
+./ViconDataServer --ip 172.19.0.61 --object arena --rate 1 --connection local --port 5553 --track_markers
+```
+
+It is possible to run multiple instances of the data server, if you want to track multiple objects.
+
+In one terminal for example:
+
+```
+./ViconDataServer --ip 172.19.0.61 --object arena --rate 1
+```
+
+In a second terminal:
+```
+/ViconDataServer --ip 172.19.0.61 --object kamala
+```
+
+As these are both streaming to a local client, they bind to "ipc:///tmp/vicon_data_" + rigid_body_name
+
+If using the remote option, different ports should be set for each instance.
+
 
 ## Run the python client
-The python client reads position and velocity data from the ViconDataServer. If the server is running on the same machine as the python client. pass the argument 'local', otherwise 'remote'. If the server is running in docker, use 'remote'.
+The python client reads position and velocity data from the ViconDataServer. If the server is running on the same machine as the python client, the connecttion is 'local', otherwise 'remote'.
+If the server is running in docker, use 'remote'.
 
 ```
-python3 python/vicon_data_client.py local
+python3 python/vicon_data_client.py --object kamala --connection local
 ```
+For a remote connection, pass the ip and port:
+
+```
+python3 vicon_data_client.py --object arena --port 5553 --connection remote --ip 127.0.0.1
+```
+
+vicon_data_client_rb.py does more processing on the data but currently is only implemented for tracking a rigid body and not rigid body + markers.
 
 ## Docker
 

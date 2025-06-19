@@ -57,8 +57,8 @@ def plot_from_csv(csv_filename):
     time_data = data["time"].to_numpy()
     x, y, z = data["x"].to_numpy(), data["y"].to_numpy(), data["z"].to_numpy()
     roll, pitch, yaw = data["roll"].to_numpy(), data["pitch"].to_numpy(), data["yaw"].to_numpy()
-    vx, vy, vz = data["vx"].to_numpy(), data["vy"].to_numpy(), data["vz"].to_numpy()
-    wx, wy, wz = data["wx"].to_numpy(), data["wy"].to_numpy(), data["wz"].to_numpy()
+    #vx, vy, vz = data["vx"].to_numpy(), data["vy"].to_numpy(), data["vz"].to_numpy()
+    #wx, wy, wz = data["wx"].to_numpy(), data["wy"].to_numpy(), data["wz"].to_numpy()
 
     fig, axs = plt.subplots(4, 1, figsize=(12, 16))
 
@@ -80,23 +80,23 @@ def plot_from_csv(csv_filename):
     axs[1].legend()
     axs[1].grid(True)
 
-    axs[2].plot(time_data, vx, label="Vx (m/s)")
-    axs[2].plot(time_data, vy, label="Vy (m/s)")
-    axs[2].plot(time_data, vz, label="Vz (m/s)")
-    axs[2].set_title("Linear Velocity")
-    axs[2].set_xlabel("Time (s)")
-    axs[2].set_ylabel("Linear Velocity (m/s)")
-    axs[2].legend()
-    axs[2].grid(True)
+    #axs[2].plot(time_data, vx, label="Vx (m/s)")
+    #axs[2].plot(time_data, vy, label="Vy (m/s)")
+    #axs[2].plot(time_data, vz, label="Vz (m/s)")
+    #axs[2].set_title("Linear Velocity")
+    #axs[2].set_xlabel("Time (s)")
+    #axs[2].set_ylabel("Linear Velocity (m/s)")
+    #axs[2].legend()
+    #axs[2].grid(True)
 
-    axs[3].plot(time_data, wx, label="Wx (rad/s)")
-    axs[3].plot(time_data, wy, label="Wy (rad/s)")
-    axs[3].plot(time_data, wz, label="Wz (rad/s)")
-    axs[3].set_title("Angular Velocity")
-    axs[3].set_xlabel("Time (s)")
-    axs[3].set_ylabel("Angular Velocity (rad/s)")
-    axs[3].legend()
-    axs[3].grid(True)
+    #axs[3].plot(time_data, wx, label="Wx (rad/s)")
+    #axs[3].plot(time_data, wy, label="Wy (rad/s)")
+    #axs[3].plot(time_data, wz, label="Wz (rad/s)")
+    #axs[3].set_title("Angular Velocity")
+    #axs[3].set_xlabel("Time (s)")
+    #axs[3].set_ylabel("Angular Velocity (rad/s)")
+    #axs[3].legend()
+    #axs[3].grid(True)
 
     plt.tight_layout()
     plt.show()
@@ -126,12 +126,12 @@ def plot_live(connection_type):
     print("Listening for live Vicon data...")
 
     # Initialize live plotting
-    fig, axs = plt.subplots(4, 1, figsize=(12, 16))
+    fig, axs = plt.subplots(2, 1, figsize=(12, 16))
     time_data = []
     position_data = []
     rpy_data = []
-    linear_velocity_data = []
-    angular_velocity_data = []
+    #linear_velocity_data = []
+    #angular_velocity_data = []
     collected_data = []
 
     try:
@@ -144,23 +144,26 @@ def plot_live(connection_type):
 
             position = data["pose"]["position"]
             orientation = data["pose"]["orientation"]
-            linear_velocity = data["velocity"]["world_frame"]["linear"]
-            angular_velocity = data["velocity"]["world_frame"]["angular"]
+            #linear_velocity = data["velocity"]["world_frame"]["linear"]
+            #angular_velocity = data["velocity"]["world_frame"]["angular"]
 
-            rpy = quaternion_to_rpy(orientation[3], orientation[0], orientation[1], orientation[2])  # [w, x, y, z]
-
+            try:
+                rpy = quaternion_to_rpy(orientation[3], orientation[0], orientation[1], orientation[2])  # [w, x, y, z]
+            except (IndexError, TypeError, ValueError) as e:
+                # Handle any errors that might occur (index out of range, wrong type, etc.)
+                print(f"Error converting quaternion to rpy: {e}")
+                rpy = [0, 0, 0]  # Default to zero values for roll, pitch, yaw
             collected_data.append({
                 "time": curr_time,
                 "x": position[0], "y": position[1], "z": position[2],
-                "roll": rpy[0], "pitch": rpy[1], "yaw": rpy[2],
-                "vx": linear_velocity[0], "vy": linear_velocity[1], "vz": linear_velocity[2],
-                "wx": angular_velocity[0], "wy": angular_velocity[1], "wz": angular_velocity[2]
-            })
+                "roll": rpy[0], "pitch": rpy[1], "yaw": rpy[2]})
+                #"vx": linear_velocity[0], "vy": linear_velocity[1], "vz": linear_velocity[2],
+                #"wx": angular_velocity[0], "wy": angular_velocity[1], "wz": angular_velocity[2]
 
             time_data.append(curr_time)
             position_data.append(position)
-            linear_velocity_data.append(linear_velocity)
-            angular_velocity_data.append(angular_velocity)
+            #linear_velocity_data.append(linear_velocity)
+            #angular_velocity_data.append(angular_velocity)
             rpy_data.append(rpy)
 
             # Limit data to the last 100 points
@@ -168,8 +171,8 @@ def plot_live(connection_type):
                 time_data = time_data[-100:]
                 position_data = position_data[-100:]
                 rpy_data = rpy_data[-100:]
-                linear_velocity_data = linear_velocity_data[-100:]
-                angular_velocity_data = angular_velocity_data[-100:]
+                #linear_velocity_data = linear_velocity_data[-100:]
+                #angular_velocity_data = angular_velocity_data[-100:]
 
             # Update plots
             axs[0].cla()
@@ -192,25 +195,25 @@ def plot_live(connection_type):
             axs[1].legend()
             axs[1].grid(True)
 
-            axs[2].cla()
-            axs[2].plot(time_data, [v[0] for v in linear_velocity_data], label="Vx (m/s)")
-            axs[2].plot(time_data, [v[1] for v in linear_velocity_data], label="Vy (m/s)")
-            axs[2].plot(time_data, [v[2] for v in linear_velocity_data], label="Vz (m/s)")
-            axs[2].set_title("Linear Velocity")
-            axs[2].set_xlabel("Time (s)")
-            axs[2].set_ylabel("Linear Velocity (m/s)")
-            axs[2].legend()
-            axs[2].grid(True)
+            #axs[2].cla()
+            #axs[2].plot(time_data, [v[0] for v in linear_velocity_data], label="Vx (m/s)")
+            #axs[2].plot(time_data, [v[1] for v in linear_velocity_data], label="Vy (m/s)")
+            #axs[2].plot(time_data, [v[2] for v in linear_velocity_data], label="Vz (m/s)")
+            #axs[2].set_title("Linear Velocity")
+            #axs[2].set_xlabel("Time (s)")
+            #axs[2].set_ylabel("Linear Velocity (m/s)")
+            #axs[2].legend()
+            #axs[2].grid(True)
 
-            axs[3].cla()
-            axs[3].plot(time_data, [w[0] for w in angular_velocity_data], label="Wx (rad/s)")
-            axs[3].plot(time_data, [w[1] for w in angular_velocity_data], label="Wy (rad/s)")
-            axs[3].plot(time_data, [w[2] for w in angular_velocity_data], label="Wz (rad/s)")
-            axs[3].set_title("Angular Velocity")
-            axs[3].set_xlabel("Time (s)")
-            axs[3].set_ylabel("Angular Velocity (rad/s)")
-            axs[3].legend()
-            axs[3].grid(True)
+            #axs[3].cla()
+            #axs[3].plot(time_data, [w[0] for w in angular_velocity_data], label="Wx (rad/s)")
+            #axs[3].plot(time_data, [w[1] for w in angular_velocity_data], label="Wy (rad/s)")
+            #axs[3].plot(time_data, [w[2] for w in angular_velocity_data], label="Wz (rad/s)")
+            #axs[3].set_title("Angular Velocity")
+            #axs[3].set_xlabel("Time (s)")
+            #axs[3].set_ylabel("Angular Velocity (rad/s)")
+            #axs[3].legend()
+            #axs[3].grid(True)
 
             plt.tight_layout()
             plt.pause(0.01)
